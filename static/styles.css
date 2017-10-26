@@ -33,5 +33,20 @@ h2 {
 }
 
 .step-title {
-  font-size: 2.5vw;
+  font-size: 2vw;
+}
+
+.step-sub-title {
+  font-size: 1vw;
+}
+
+.exp-panel-content {
+  max-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.exp-panel-container {
+  max-height: 100%;
+  overflow-y: auto;
 }

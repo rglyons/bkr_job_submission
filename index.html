@@ -18,30 +18,36 @@
     <v-stepper id="stepper" class="elevation-5" v-model="e1">
       <v-stepper-header>
         <v-stepper-step step="1" :complete="eUser && e1 > 1" :rules="[validateStepOne]">
-          Choose User
+          User
           <small v-if="!validOne">No user selected!</small>
           <small v-else>{{ eUser }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
         <v-stepper-step step="2" :complete="eOS && e1 > 2" :rules="[validateStepTwo]">
-          Choose Operating System
+          Operating System
           <small v-if="!validTwo">No OS selected!</small>
           <small v-else-if="eOS">{{ eOS.distro }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="3" :complete="eTest && e1 > 3" :rules="[validateStepThree]">
-          Choose Test
-          <small v-if="!validThree">No test selected!</small>
+        <v-stepper-step step="3" :complete="e1 > 3">
+          Kernel Patch
+          <small v-if="!eKP">Optional</small>
+          <small v-else-if="eKP">{{ eKP }}</small>
+        </v-stepper-step>
+        <v-divider></v-divider>
+        <v-stepper-step step="4" :complete="eTest && e1 > 4" :rules="[validateStepFour]">
+          Test
+          <small v-if="!validFour">No test selected!</small>
           <small v-else>{{ eTest }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="4" :complete="ePool && e1 > 4" :rules="[validateStepFour]">
-          Choose Target Pool
-          <small v-if="!validFour">No pool selected!</small>
+        <v-stepper-step step="5" :complete="ePool && e1 > 5" :rules="[validateStepFive]">
+          Target Pool
+          <small v-if="!validFive">No pool selected!</small>
           <small v-else>{{ ePool }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="5">Review & Submit</v-stepper-step>
+        <v-stepper-step step="6">Review & Submit</v-stepper-step>
       </v-stepper-header>
       <!-- step 1 content -->
       <v-stepper-content step="1">
@@ -64,14 +70,16 @@
           <v-expansion-panel>
             <v-expansion-panel-content v-for="(distro,i) in distros" :key="i">
               <div slot="header">{{distro.name}}</div>
-              <v-radio-group v-model="eOS">
-                <v-radio
-                  class="ml-4 py-2"
-                  v-for="(version, j) in distro.versions" :key="j"
-                  :value="{family: distro.name, distro: version}">
-                  <div slot="label">{{ version }}</div>
-                </v-radio>
-              </v-radio-group>
+              <div class="exp-panel-content">
+                <v-radio-group v-model="eOS">
+                  <v-radio
+                    class="ml-4 py-2"
+                    v-for="(version, j) in distro.versions" :key="j"
+                    :value="{family: distro.name, distro: version}">
+                    <div slot="label">{{ version }}</div>
+                  </v-radio>
+                </v-radio-group>
+              </div>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-card>
@@ -81,14 +89,14 @@
       <!-- step 3 content -->
       <v-stepper-content step="3">
         <v-card class="mb-2" height="500px">
-          <div class="step-title text-xs-center px-3 py-5">Select the test to execute</div>
+          <div class="step-title text-xs-center px-3 pt-5 pb-3">Select a kernel patch</div>
+          <div class="step-sub-title text-xs-center px-3 pt-1 pb-4">This step is optional</div>
           <v-select class="picker"
-            :items="tests"
-            v-model="eTest"
-            label="Select Test"
+            :items="kernelPatches"
+            v-model="eKP"
+            label="Select Kernel Patch"
             item-text="name"
             item-value="name"
-            :rules="[validateTest]"
           ></v-select>
         </v-card>
         <v-btn primary @click.native="e1 = 4">Continue</v-btn>
@@ -96,6 +104,30 @@
       </v-stepper-content>
       <!-- step 4 content -->
       <v-stepper-content step="4">
+        <v-card class="mb-2" height="500px">
+          <div class="exp-panel-container">
+            <v-expansion-panel>
+              <v-expansion-panel-content v-for="(test,i) in tests" :key="i">
+                <div slot="header">{{test.category}}</div>
+                <div class="exp-panel-content">
+                  <v-radio-group v-model="eTest">
+                    <v-radio
+                      class="ml-4 py-2"
+                      v-for="(task, j) in test.tasks" :key="j"
+                      :value="task">
+                      <div slot="label">{{ task }}</div>
+                    </v-radio>
+                  </v-radio-group>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </div>
+        </v-card>
+        <v-btn primary @click.native="e1 = 5">Continue</v-btn>
+        <v-btn flat error @click.native="e1 = 3">Back</v-btn>
+      </v-stepper-content>
+      <!-- step 5 content -->
+      <v-stepper-content step="5">
         <v-card class="mb-2" height="500px">
           <div class="step-title text-xs-center px-3 py-5">Select the target pool</div>
           <v-select class="picker"
@@ -107,14 +139,15 @@
             :rules="[validatePool]"
           ></v-select>
         </v-card>
-        <v-btn primary @click.native="e1 = 5">Continue</v-btn>
+        <v-btn primary @click.native="e1 = 6">Continue</v-btn>
         <v-btn flat error @click.native="e1 = 4">Back</v-btn>
       </v-stepper-content>
-      <!-- step 5 content -->
-      <v-stepper-content step="5">
+      <!-- step 6 content -->
+      <v-stepper-content step="6">
         <v-card class="mb-2" height="500px">
           <div class="step-title py-4 px-4">Username: <span class="green--text text-cs-center">{{ eUser }}</span></div>
           <div class="step-title py-4 px-4">Operating System: <span v-if="eOS" class="green--text">{{ eOS.distro }}</span></div>
+          <div v-if="eKP" class="step-title py-4 px-4">Kernel Patch: <span v-if="eKP" class="green--text">{{ eKP }}</span></div>
           <div class="step-title py-4 px-4">Test: <span class="green--text">{{ eTest }}</span></div>
           <div class="step-title py-4 px-4">Target Pool: <span class="green--text">{{ ePool }}</span></div>
         </v-card>
@@ -127,9 +160,10 @@
           Go
           <span slot="loader">Loading...</span>
         </v-btn>
-        <v-btn flat error @click.native="e1 = 3">Back</v-btn>
+        <v-btn flat error @click.native="e1 = 5">Back</v-btn>
       </v-stepper-content>
     </v-stepper>
+    <!-- notification of job submission status -->
     <v-alert
       class="mt-4"
       style="width: 70%; margin: auto"
@@ -169,22 +203,17 @@
         submitAlert: false,
         eUser: null,
         eOS: null,
+        eKP: null,
         eTest: null,
         ePool: null,
         validOne: true,
         validTwo: true,
-        validThree: true,
         validFour: true,
+        validFive: true,
         users: [],
         distros: [],
-        tests: [
-          {name: '/distribution/inventory'},
-          {name: '/validation/bios/smbioschk'},
-          {name: '/validation/bootchk/bootlogchk'},
-          {name: '/validation/ethernet/enetping'},
-          {name: '/validation/memory/memtestr'},
-          {name: '/validation/sata/satahdparm'},
-        ],
+        kernelPatches: [],
+        tests: [],
         pools: []
       },
       methods: {
@@ -231,15 +260,15 @@
           else this.validTwo = true
           return this.validTwo
         },
-        validateStepThree () {
-          if (this.eTest == null && this.e1 > 3) this.validThree = false
-          else this.validThree = true
-          return this.validThree
-        },
         validateStepFour () {
-          if (this.ePool == null && this.e1 > 4) this.validFour = false
+          if (this.eTest == null && this.e1 > 4) this.validFour = false
           else this.validFour = true
           return this.validFour
+        },
+        validateStepFive () {
+          if (this.ePool == null && this.e1 > 5) this.validFive = false
+          else this.validFive = true
+          return this.validFive
         },
         validateTest () {
           if (!this.eTest) return 'Required'
@@ -256,7 +285,9 @@
         .then((res) => {
           this.users = res.data.users
           this.distros = res.data.distros
+          this.kernelPatches = res.data.patches
           this.pools = res.data.pools
+          this.tests = res.data.tests
         })
         .catch((err) => {
           console.log(err)
