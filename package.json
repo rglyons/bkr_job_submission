@@ -1,0 +1,21 @@
+{
+  "name": "job_submission",
+  "version": "1.0.0",
+  "description": "Beaker job submission application",
+  "main": "index.js",
+  "scripts": {
+    "dev": "NODE_ENV=development nodemon ./index.js"
+  },
+  "author": "Robert Lyons",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.0",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mysql": "^2.15.0",
+    "nodemon": "^1.12.1",
+    "vue": "^2.5.2",
+    "vuetify": "^0.15.7"
+  }
+}
