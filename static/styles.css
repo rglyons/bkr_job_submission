@@ -16,7 +16,7 @@ h2 {
   margin-top: 60px;
   margin-bottom: 30px;
   font-family: 'Iceland', sans-serif;
-  font-size: 5vw;
+  font-size: 6vmin;
   text-shadow: 5px 5px 1px #ccc;
 }
 
@@ -26,6 +26,10 @@ h2 {
   background-color: #f5f5f5;
 }
 
+.stepper-card {
+  height: 50vh !important;
+}
+
 .picker {
   width: 50%;
   margin: auto;
@@ -33,11 +37,11 @@ h2 {
 }
 
 .step-title {
-  font-size: 2vw;
+  font-size: 3vmin;
 }
 
 .step-sub-title {
-  font-size: 1vw;
+  font-size: 2vmin;
 }
 
 .exp-panel-content {

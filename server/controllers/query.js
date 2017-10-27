@@ -123,7 +123,7 @@ module.exports = {
           return (A < B) ? -1 : (A > B) ? 1 : 0;
         })
         // get the APM linux versions on the local drive
-        fs.readdir('/home/amcclab/Documents/job_submission/static', (err, files) => {
+        fs.readdir('/var/www/html/apm/kernelpatch', (err, files) => {
           if (err) {
             console.log(err)
             throw new Error('FS READDIR ERROR')
@@ -143,9 +143,6 @@ module.exports = {
             patches: patches
           }
           // allow CORS for speedy development
-          res.set({
-            "Access-Control-Allow-Origin": "http://10.76.144.103"
-          })
           return res.status(200).send(result)
         })
       })

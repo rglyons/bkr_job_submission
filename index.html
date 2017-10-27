@@ -182,7 +182,7 @@
       dismissible
       v-model="submitAlert"
     >
-      Job Submitted Successfully
+      Job Submitted Successfully - Job ID = {{ jobId }}
     </v-alert>
     <v-alert
       class="mt-4"
@@ -204,11 +204,12 @@
     new Vue({
       el: '#app',
       data: {
-        host: 'http://10.76.144.103:3030',
+        host: 'http://10.76.134.4:3030',
         e1: 1,
         loading: false,
         jobStatusSuccess: false,
         submitAlert: false,
+        jobId: null,
         eUser: null,
         eOS: null,
         eKP: null,
@@ -227,21 +228,17 @@
       methods: {
         submitJob () {
           this.loading = true
-          let test = this.eTest.split('/')[this.eTest.split('/').length-1]
-          let cmd = 'bkr workflow-simple --username='+this.eUser+' --password=beaker \
-          --family='+this.eOS.family+'  --distro="'+this.eOS.distro+'" \
-          --hostrequire=pool='+this.ePool+' \
-          --kernel-options="ip=enP6p1s0:dhcp ifname=enP6p1s0:A0:36:9F:D7:73:BD cma=1024M" \
-          --ks-meta="clearpart=--initlabel --all zerombr ignoredisk=--only-use=/dev/disk/by-path/platform-APMC0D33:01-ata-1.0" \
-          --kernel-options-post="iommu.passthrough=0" \
-          --whiteboard=pool_'+this.ePool+'_'+this.eOS.distro+'_'+test+' \
-          --task='+this.eTest
-
           // POST command to be executed by backend server
           axios.post(this.host + '/api/job/execute_job', {
-            command: cmd
+            user: this.eUser,
+            family: this.eOS.family,
+            distro: this.eOS.distro,
+            pool: this.ePool,
+            test: this.eTest,
+            patch: this.eKP
           })
           .then((res) => {
+            this.jobId = res.data.jobId
             this.submitAlert = true
             this.jobStatusSuccess = true
             this.loading = false
