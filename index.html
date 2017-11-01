@@ -313,7 +313,6 @@
       methods: {
         submitJob () {
           this.loading = true
-          this.submitAlert = false
           // POST command to be executed by backend server
           axios.post(this.host + '/api/job/execute_job', {
             user: this.eUser,
