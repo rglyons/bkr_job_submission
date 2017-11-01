@@ -5,21 +5,37 @@ const fs = require('fs');
 module.exports = {
 
   executeJob (req, res) {
-    // assemble command string
+    // handle varying parts of cmd line
+    let cmd_system = (req.body.system.includes('rack')) ? '--machine='+req.body.system : '--hostrequire=pool='+req.body.system
+    if (req.body.system.includes('rack')) {
+      // build system element of the whiteboard (R<rack no.>-<board no.>_<serial no.>)
+      let i = req.body.system.indexOf('rack')
+      var wb_system = 'R' + req.body.system.substring(i+4, i+7) + '-'   // rack number
+      let temp = req.body.system.split('-')[0]
+      temp = temp.substring(temp.length-2, temp.length) // board number (01-08)
+      wb_system += temp + '_'
+      let start_i = req.body.system.indexOf('-') + 1
+      let end_i = req.body.system.indexOf('.rack')
+      wb_system += req.body.system.substring(start_i, end_i)   // serial number
+    } else {
+      var wb_system = req.body.system   // otherwise, just use the pool name
+    }
     let wb_test = req.body.test.split('/')[req.body.test.split('/').length-1]
     let wb_distro = req.body.distro.replace(/\s/g, '_')
     let wb_patch = (req.body.patch) ? req.body.patch.substring(0, req.body.patch.indexOf('.ilp')) + '_' : ''
+    // build command line for execution
     let cmd = 'bkr workflow-simple --username='+req.body.user+' --password=beaker \
     --family='+req.body.family+'  --distro="'+req.body.distro+'" \
-    --hostrequire=pool='+req.body.system+' \
+    ' + cmd_system + ' \
     --kernel-options="ip=enP6p1s0:dhcp ifname=enP6p1s0:A0:36:9F:D7:73:BD cma=1024M" \
     --ks-meta="clearpart=--initlabel --all zerombr ignoredisk=--only-use=/dev/disk/by-path/platform-APMC0D33:01-ata-1.0" \
     --kernel-options-post="iommu.passthrough=0" \
-    --whiteboard='+req.body.system+'_'+wb_distro+'_'+wb_patch+wb_test+' \
+    --whiteboard='+wb_system+'_'+wb_distro+'_'+wb_patch+wb_test+' \
     --task='+req.body.test
+    console.log(cmd)
     // execute command and collect output
     let p = new Promise(function (resolve, reject) {
-      child = exec(cmd,
+      child = exec('echo hello world',
         function (error, stdout, stderr) {
           var out = stdout
           var err = stderr

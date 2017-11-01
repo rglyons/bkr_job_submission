@@ -108,6 +108,7 @@ module.exports = {
         for (let prop in distros_temp) {
           distros.push(distros_temp[prop])
         }
+        for (grp of distros) grp.versions.sort()
         //format task data
         let tests_temp = {}
         let tests = []
@@ -124,6 +125,26 @@ module.exports = {
           var B = t2.category.toLowerCase();
           return (A < B) ? -1 : (A > B) ? 1 : 0;
         })
+        for (grp of tests) grp.tasks.sort()
+        // format system data
+        let sys_temp = {}
+        let systems = []
+        for (let i of queryData[4]) {
+          let j = i.fqdn.indexOf('rack')
+          let rack = i.fqdn.substring(j, j+7)
+          rack = rack.charAt(0).toUpperCase() + rack.slice(1, 4) + ' ' + rack.slice(4)
+          if (!sys_temp[rack]) sys_temp[rack] = {rack: rack, boards: [i.fqdn]}
+          else sys_temp[rack].boards.push(i.fqdn)
+        }
+        for (let prop in sys_temp) {
+          systems.push(sys_temp[prop])
+        }
+        for (grp of systems) grp.boards.sort()
+        systems.sort(function(s1, s2) {
+          var A = s1.rack.toLowerCase();
+          var B = s2.rack.toLowerCase();
+          return (A < B) ? -1 : (A > B) ? 1 : 0;
+        })
         // get the APM linux versions on the local drive
         let files = fs.readdirSync('/var/www/html/apm/kernelpatch')
         let patches = []
@@ -131,6 +152,11 @@ module.exports = {
           patches.push({
             name: file
           })
+        })
+        patches.sort(function(p1, p2) {
+          var A = p1.name.toLowerCase();
+          var B = p2.name.toLowerCase();
+          return (A < B) ? -1 : (A > B) ? 1 : 0;
         })
         // get firmware files
         files = fs.readdirSync('/var/www/html/apm/firmware')
@@ -140,11 +166,27 @@ module.exports = {
           else if (file.includes('atfbios')) firmware.aptio.push({name: file})
           else if (file.includes('ast2500')) firmware.bmc.push({name: file})
         })
+        firmware.smpmpro.sort(function(a, b) {
+          var A = a.name.toLowerCase();
+          var B = b.name.toLowerCase();
+          return (A < B) ? -1 : (A > B) ? 1 : 0;
+        })
+        firmware.aptio.sort(function(a, b) {
+          var A = a.name.toLowerCase();
+          var B = b.name.toLowerCase();
+          return (A < B) ? -1 : (A > B) ? 1 : 0;
+        })
+        firmware.bmc.sort(function(a, b) {
+          var A = a.name.toLowerCase();
+          var B = b.name.toLowerCase();
+          return (A < B) ? -1 : (A > B) ? 1 : 0;
+        })
         // compile resulting data object
         let result = {
           users: queryData[0],
           distros: distros,
           pools: queryData[2],
+          systems: systems,
           tests: tests,
           patches: patches,
           firmware: firmware
