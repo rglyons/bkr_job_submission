@@ -14,6 +14,7 @@
 <body>
 
   <v-app id="app">
+    <div class="wrapper">
     <h2 class="text-xs-center">BEAKER JOB SUBMISSION</h2>
     <v-stepper id="stepper" class="elevation-5" v-model="e1">
       <v-stepper-header>
@@ -23,35 +24,41 @@
           <small v-else>{{ eUser }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="2" :complete="eOS && e1 > 2" :rules="[validateStepTwo]">
+        <v-stepper-step step="2" :complete="e1 > 2" :rules="[validateStepTwo]">
+          Firmware
+          <small v-if="!(eFW.smpmpro && eFW.aptio && eFW.bmc)">Optional</small>
+          <small v-else>Firmware selected</small>
+        </v-stepper-step>
+        <v-divider></v-divider>
+        <v-stepper-step step="3" :complete="eOS && e1 > 3" :rules="[validateStepThree]">
           Operating System
-          <small v-if="!validTwo">No OS selected!</small>
+          <small v-if="!validThree">No OS selected!</small>
           <small v-else-if="eOS">{{ eOS.distro }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="3" :complete="e1 > 3">
+        <v-stepper-step step="4" :complete="e1 > 4">
           Kernel Patch
           <small v-if="!eKP">Optional</small>
           <small v-else-if="eKP">{{ eKP }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="4" :complete="eTest && e1 > 4" :rules="[validateStepFour]">
+        <v-stepper-step step="5" :complete="eTest && e1 > 5" :rules="[validateStepFive]">
           Test
-          <small v-if="!validFour">No test selected!</small>
+          <small v-if="!validFive">No test selected!</small>
           <small v-else>{{ eTest }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="5" :complete="ePool && e1 > 5" :rules="[validateStepFive]">
-          Target Pool
-          <small v-if="!validFive">No pool selected!</small>
-          <small v-else>{{ ePool }}</small>
+        <v-stepper-step step="6" :complete="eSystem && e1 > 6" :rules="[validateStepSix]">
+          Target System
+          <small v-if="!validSix">No system selected!</small>
+          <small v-else>{{ eSystem }}</small>
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="6">Review & Submit</v-stepper-step>
+        <v-stepper-step step="7">Review & Submit</v-stepper-step>
       </v-stepper-header>
       <!-- step 1 content -->
       <v-stepper-content step="1">
-        <v-card class="mb-2" height="500px">
+        <v-card class="mb-2 stepper-card">
           <div class="step-title text-xs-center px-3 py-5">Select your Beaker user ID</div>
           <v-select class="picker"
             :items="users"
@@ -66,7 +73,45 @@
       </v-stepper-content>
       <!-- step 2 content -->
       <v-stepper-content step="2">
-        <v-card class="mb-2" height="500px">
+        <v-card class="mb-2 stepper-card">
+          <div class="step-title text-xs-center px-3 pt-5 pb-3">Select firmware</div>
+          <div class="step-sub-title text-xs-center px-3 pt-1 pb-4">This step is optional</div>
+          <v-select class="picker fw"
+            :items="firmware.smpmpro"
+            v-model="eFW.smpmpro"
+            label="Select smpmpro"
+            item-text="name"
+            item-value="name"
+          ></v-select>
+          <v-select class="picker fw"
+            :items="firmware.aptio"
+            v-model="eFW.aptio"
+            label="Select aptio"
+            item-text="name"
+            item-value="name"
+          ></v-select>
+          <v-select class="picker fw"
+            :items="firmware.bmc"
+            v-model="eFW.bmc"
+            label="Select bmc"
+            item-text="name"
+            item-value="name"
+          ></v-select>
+          <div class="text-xs-center">
+            <v-btn
+              flat
+              class="mt-3 mb-1 purple--text darken-1"
+              @click.native="eFW.smpmpro = null; eFW.aptio = null; eFW.bmc = null">
+                Clear Selection
+            </v-btn>
+          </div>
+        </v-card>
+        <v-btn primary @click.native="e1 = 3">Continue</v-btn>
+        <v-btn flat error @click.native="e1 = 1">Back</v-btn>
+      </v-stepper-content>
+      <!-- step 3 content -->
+      <v-stepper-content step="3">
+        <v-card class="mb-2 stepper-card">
           <v-expansion-panel>
             <v-expansion-panel-content v-for="(distro,i) in distros" :key="i">
               <div slot="header">{{distro.name}}</div>
@@ -83,12 +128,12 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-card>
-        <v-btn primary @click.native="e1 = 3">Continue</v-btn>
-        <v-btn flat error @click.native="e1 = 1">Back</v-btn>
+        <v-btn primary @click.native="e1 = 4">Continue</v-btn>
+        <v-btn flat error @click.native="e1 = 2">Back</v-btn>
       </v-stepper-content>
-      <!-- step 3 content -->
-      <v-stepper-content step="3">
-        <v-card class="mb-2" height="500px">
+      <!-- step 4 content -->
+      <v-stepper-content step="4">
+        <v-card class="mb-2 stepper-card">
           <div class="step-title text-xs-center px-3 pt-5 pb-3">Select a kernel patch</div>
           <div class="step-sub-title text-xs-center px-3 pt-1 pb-4">This step is optional</div>
           <v-select class="picker"
@@ -107,74 +152,103 @@
             </v-btn>
           </div>
         </v-card>
-        <v-btn primary @click.native="e1 = 4">Continue</v-btn>
-        <v-btn flat error @click.native="e1 = 2">Back</v-btn>
-      </v-stepper-content>
-      <!-- step 4 content -->
-      <v-stepper-content step="4">
-        <v-card class="mb-2" height="500px">
-          <div class="exp-panel-container">
-            <v-expansion-panel>
-              <v-expansion-panel-content v-for="(test,i) in tests" :key="i">
-                <div slot="header">{{test.category}}</div>
-                <div class="exp-panel-content">
-                  <v-radio-group v-model="eTest">
-                    <v-radio
-                      class="ml-4 py-2"
-                      v-for="(task, j) in test.tasks" :key="j"
-                      :value="task">
-                      <div slot="label">{{ task }}</div>
-                    </v-radio>
-                  </v-radio-group>
-                </div>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </div>
-        </v-card>
         <v-btn primary @click.native="e1 = 5">Continue</v-btn>
         <v-btn flat error @click.native="e1 = 3">Back</v-btn>
       </v-stepper-content>
       <!-- step 5 content -->
       <v-stepper-content step="5">
-        <v-card class="mb-2" height="500px">
-          <div class="step-title text-xs-center px-3 py-5">Select the target pool</div>
-          <v-select class="picker"
-            :items="pools"
-            v-model="ePool"
-            label="Select Pool"
-            item-text="name"
-            item-value="name"
-            :rules="[validatePool]"
-          ></v-select>
+        <v-card class="mb-2 stepper-card">
+          <v-expansion-panel>
+            <v-expansion-panel-content v-for="(test,i) in tests" :key="i">
+              <div slot="header">{{test.category}}</div>
+              <div class="exp-panel-content">
+                <v-radio-group v-model="eTest">
+                  <v-radio
+                    class="ml-4 py-2"
+                    v-for="(task, j) in test.tasks" :key="j"
+                    :value="task">
+                    <div slot="label">{{ task }}</div>
+                  </v-radio>
+                </v-radio-group>
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
         </v-card>
         <v-btn primary @click.native="e1 = 6">Continue</v-btn>
         <v-btn flat error @click.native="e1 = 4">Back</v-btn>
       </v-stepper-content>
       <!-- step 6 content -->
       <v-stepper-content step="6">
-        <v-card class="mb-2" height="500px">
+        <v-card class="mb-2 stepper-card">
+          <v-tabs :scrollable="false">
+            <v-tabs-bar class="grey lighten-4">
+              <v-tabs-item :href="'tab-1'">Pools</v-tabs-item>
+              <v-tabs-item :href="'tab-2'">Systems</v-tabs-item>
+              <v-tabs-slider color="blue"></v-tabs-slider>
+            </v-tabs-bar>
+            <v-tabs-items>
+              <v-tabs-content :id="'tab-1'">
+                <v-card flat>
+                  <!-- <v-select class="picker"
+                    :items="pools"
+                    v-model="eSystem"
+                    label="Select Pool"
+                    item-text="name"
+                    item-value="name"
+                    :rules="[validateSystem]"
+                  ></v-select> -->
+                  <v-radio-group v-model="eSystem">
+                    <v-radio
+                      class="ml-4 py-2"
+                      v-for="(pool, j) in pools" :key="j"
+                      :value="pool.name">
+                      <div slot="label">{{ pool.name }}</div>
+                    </v-radio>
+                  </v-radio-group>
+                </v-card>
+              </v-tabs-content>
+              <v-tabs-content :id="'tab-2'">
+                <v-card flat>
+                  <v-card-text>hello world</v-card-text>
+                </v-card>
+              </v-tabs-content>
+            </v-tabs-items>
+          </v-tabs>
+        </v-card>
+        <v-btn primary @click.native="e1 = 7">Continue</v-btn>
+        <v-btn flat error @click.native="e1 = 5">Back</v-btn>
+      </v-stepper-content>
+      <!-- step 7 content -->
+      <v-stepper-content step="7">
+        <v-card class="mb-2 stepper-card">
           <div class="step-title py-4 px-4">Username: <span class="green--text text-cs-center">{{ eUser }}</span></div>
+          <div v-if="eFW.smpmpro && eFW.aptio && eFW.bmc" class="step-title py-4 px-4">
+            Firmware
+            <p>&nbsp;&nbsp;&nbsp;smpmpro: <span class="green--text">{{ eFW.smpmpro }}</span></p>
+            <p>&nbsp;&nbsp;&nbsp;aptio: <span class="green--text">{{ eFW.aptio }}</span></p>
+            <p>&nbsp;&nbsp;&nbsp;bmc: <span class="green--text">{{ eFW.bmc }}</span></p>
+          </div>
           <div class="step-title py-4 px-4">Operating System: <span v-if="eOS" class="green--text">{{ eOS.distro }}</span></div>
-          <div v-if="eKP" class="step-title py-4 px-4">Kernel Patch: <span v-if="eKP" class="green--text">{{ eKP }}</span></div>
+          <div v-if="eKP" class="step-title py-4 px-4">Kernel Patch: <span class="green--text">{{ eKP }}</span></div>
           <div class="step-title py-4 px-4">Test: <span class="green--text">{{ eTest }}</span></div>
-          <div class="step-title py-4 px-4">Target Pool: <span class="green--text">{{ ePool }}</span></div>
+          <div class="step-title py-4 px-4">Target System: <span class="green--text">{{ eSystem }}</span></div>
         </v-card>
         <v-btn
           class="success"
           :loading="loading"
           @click.native="submitJob"
-          :disabled="!(eUser && eOS && eTest && ePool) || loading"
+          :disabled="!(eUser && eOS && eTest && eSystem) || !validateFW() || loading"
         >
           Go
           <span slot="loader">Loading...</span>
         </v-btn>
-        <v-btn flat error @click.native="e1 = 5">Back</v-btn>
+        <v-btn flat error @click.native="e1 = 6">Back</v-btn>
       </v-stepper-content>
     </v-stepper>
     <!-- notification of job submission status -->
     <v-alert
       class="mt-4"
-      style="width: 70%; margin: auto"
+      style="width: 100%; margin: auto"
       v-if="jobStatusSuccess"
       success
       icon="check_circle"
@@ -186,7 +260,7 @@
     </v-alert>
     <v-alert
       class="mt-4"
-      style="width: 70%; margin: auto"
+      style="width: 100%; margin: auto"
       v-else-if="!jobStatusSuccess"
       error
       icon="warning"
@@ -196,6 +270,7 @@
     >
       Error Submitting Job
     </v-alert>
+    </div>
   </v-app>
 
   <script>
@@ -211,18 +286,21 @@
         submitAlert: false,
         jobId: null,
         eUser: null,
+        eFW: { smpmpro: null, aptio: null, bmc: null },
         eOS: null,
         eKP: null,
         eTest: null,
-        ePool: null,
+        eSystem: null,
         validOne: true,
         validTwo: true,
-        validFour: true,
+        validThree: true,
         validFive: true,
+        validSix: true,
         users: [],
         distros: [],
         kernelPatches: [],
         tests: [],
+        firmware: {},
         pools: []
       },
       methods: {
@@ -233,9 +311,10 @@
             user: this.eUser,
             family: this.eOS.family,
             distro: this.eOS.distro,
-            pool: this.ePool,
+            system: this.eSystem,
             test: this.eTest,
-            patch: this.eKP
+            patch: this.eKP,
+            firmware: this.eFW
           })
           .then((res) => {
             this.jobId = res.data.jobId
@@ -249,7 +328,6 @@
             this.jobStatusSuccess = false
             this.loading = false
           })
-
         },
         validateUserID () {
           if (!this.eUser) return 'Required'
@@ -261,27 +339,43 @@
           return this.validOne
         },
         validateStepTwo () {
-          if (this.eOS == null && this.e1 > 2) this.validTwo = false
+          if (!this.validateFW()) this.validTwo = false
           else this.validTwo = true
           return this.validTwo
         },
-        validateStepFour () {
-          if (this.eTest == null && this.e1 > 4) this.validFour = false
-          else this.validFour = true
-          return this.validFour
+        validateStepThree () {
+          if (this.eOS == null && this.e1 > 3) this.validThree = false
+          else this.validThree = true
+          return this.validThree
         },
         validateStepFive () {
-          if (this.ePool == null && this.e1 > 5) this.validFive = false
+          if (this.eTest == null && this.e1 > 5) this.validFive = false
           else this.validFive = true
           return this.validFive
+        },
+        validateStepSix () {
+          if (this.eSystem == null && this.e1 > 6) this.validSix = false
+          else this.validSix = true
+          return this.validSix
         },
         validateTest () {
           if (!this.eTest) return 'Required'
           return true
         },
-        validatePool () {
-          if (!this.ePool) return 'Required'
+        validateSystem () {
+          if (!this.eSystem) return 'Required'
           return true
+        },
+        validateFW () {
+          if (this.eFW.smpmpro && !(this.eFW.aptio && this.eFW.bmc)) return false
+          else if (this.eFW.aptio && !(this.eFW.smpmpro && this.eFW.bmc)) return false
+          else if (this.eFW.bmc && !(this.eFW.smpmpro && this.eFW.aptio)) return false
+          return true
+        }
+      },
+      watch: {
+        eSystem () {
+          console.log(this.eSystem)
         }
       },
       created: function() {
@@ -293,6 +387,15 @@
           this.kernelPatches = res.data.patches
           this.pools = res.data.pools
           this.tests = res.data.tests
+          this.firmware = res.data.firmware
+          // fake pool data
+          this.pools.push({name: 'fake1'})
+          this.pools.push({name: 'fake2'})
+          this.pools.push({name: 'fake3'})
+          this.pools.push({name: 'fake4'})
+          this.pools.push({name: 'fake5'})
+          this.pools.push({name: 'fake6'})
+
         })
         .catch((err) => {
           console.log(err)

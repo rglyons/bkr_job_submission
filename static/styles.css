@@ -1,9 +1,15 @@
 html {
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 body {
   background: url(seamless_paper_texture.png) repeat 0 0;
+}
+
+.wrapper {
+  width: 70%;
+  height: auto;
+  margin: auto;
 }
 
 /* override vuetify background color */
@@ -12,28 +18,36 @@ body {
 }
 
 h2 {
+  position: relative;
   margin: auto;
-  margin-top: 60px;
+  margin-top: 0px;
   margin-bottom: 30px;
   font-family: 'Iceland', sans-serif;
-  font-size: 6vmin;
+  font-size: 6vw;
   text-shadow: 5px 5px 1px #ccc;
 }
 
 #stepper {
-  width: 70%;
+  width: 100%;
   margin: auto;
   background-color: #f5f5f5;
 }
 
 .stepper-card {
   height: 50vh !important;
+  overflow: auto;
 }
 
 .picker {
   width: 50%;
   margin: auto;
   margin-top: 30px;
+}
+
+.picker.fw {
+  width: 50%;
+  margin: auto;
+  margin-top: 10px;
 }
 
 .step-title {

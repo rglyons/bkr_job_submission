@@ -67,7 +67,7 @@ function execAsyncQuery(pool, query) {
 module.exports = {
 
   getLabData (req, res) {
-    let pool = initConnectionPool(4)
+    let pool = initConnectionPool(5)
     var promises = [
       // get users
       execAsyncQuery(pool, 'SELECT user_name as username, display_name as name from tg_user \
@@ -82,7 +82,9 @@ module.exports = {
       // get available system pools
       execAsyncQuery(pool, 'SELECT name FROM system_pool'),
       // get all tasks that can be executed
-      execAsyncQuery(pool, 'SELECT name FROM task'),
+      execAsyncQuery(pool, 'SELECT name FROM task WHERE valid = 1'),
+      // get non-removed systems
+      execAsyncQuery(pool, 'SELECT fqdn FROM system WHERE status != \'Removed\''),
     ]
     return Promise.all(promises)
       .then(queryData => {
@@ -123,28 +125,32 @@ module.exports = {
           return (A < B) ? -1 : (A > B) ? 1 : 0;
         })
         // get the APM linux versions on the local drive
-        fs.readdir('/var/www/html/apm/kernelpatch', (err, files) => {
-          if (err) {
-            console.log(err)
-            throw new Error('FS READDIR ERROR')
-          }
-          let patches = []
-          files.forEach(file => {
-            patches.push({
-              name: file
-            })
-          });
-          // compile resulting data object
-          let result = {
-            users: queryData[0],
-            distros: distros,
-            pools: queryData[2],
-            tests: tests,
-            patches: patches
-          }
-          // allow CORS for speedy development
-          return res.status(200).send(result)
+        let files = fs.readdirSync('/var/www/html/apm/kernelpatch')
+        let patches = []
+        files.forEach(file => {
+          patches.push({
+            name: file
+          })
         })
+        // get firmware files
+        files = fs.readdirSync('/var/www/html/apm/firmware')
+        var firmware = { smpmpro: [], aptio: [], bmc: [] }
+        files.forEach(file => {
+          if (file.includes('smpmpro')) firmware.smpmpro.push({name: file})
+          else if (file.includes('atfbios')) firmware.aptio.push({name: file})
+          else if (file.includes('ast2500')) firmware.bmc.push({name: file})
+        })
+        // compile resulting data object
+        let result = {
+          users: queryData[0],
+          distros: distros,
+          pools: queryData[2],
+          tests: tests,
+          patches: patches,
+          firmware: firmware
+        }
+        // allow CORS for speedy development
+        return res.status(200).send(result)
       })
       .catch(error => {
         if (error.message == 'FS READDIR ERROR') {
