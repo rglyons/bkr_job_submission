@@ -1,0 +1,22 @@
+# system service for running the Beaker job submission portal application
+# in the background (CentOS)
+# if you'd like to run this app as a daemon
+#       cp bkr_job_submission.service /etc/systemd/system
+#       systemctl enable bkr_job_submission.service
+
+[Unit]
+Description=Beaker Job Submission Portal Daemon
+Requires=network.target
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node index.js
+Restart=always
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/home/amcclab/Documents/job_submission
+
+[Install]
+WantedBy=multi-user.target
+Alias=bkr_job_submission
+
