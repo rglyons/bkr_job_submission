@@ -4,6 +4,7 @@
   "description": "Beaker job submission application",
   "main": "index.js",
   "scripts": {
+    "prod": "NODE_ENV=production nodemon ./index.js",
     "dev": "NODE_ENV=development nodemon ./index.js"
   },
   "author": "Robert Lyons",
@@ -13,9 +14,11 @@
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
+    "morgan": "^1.9.0",
     "mysql": "^2.15.0",
     "nodemon": "^1.12.1",
     "vue": "^2.5.2",
-    "vuetify": "^0.16.9"
+    "vuetify": "^0.16.9",
+    "winston": "^2.4.0"
   }
 }

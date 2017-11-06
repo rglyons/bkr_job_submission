@@ -1,13 +1,14 @@
 const Promise = require('bluebird');
 const mysql = require('mysql');
 const fs = require('fs');
+const logger = require('../logger');
 
 
 /*
 * Establish & control a DB connection
 */
 function initConnectionPool(nConn) {
-  console.log("Creating new connection pool instance with "
+  logger.info("Creating new connection pool instance with "
               + nConn + " connection(s)...");
   var pool  = mysql.createPool({
     connectionLimit : nConn,
@@ -18,10 +19,10 @@ function initConnectionPool(nConn) {
   });
   // pool status logging
   pool.on('acquire', function (connection) {
-    console.log('Connection %d acquired', connection.threadId);
+    logger.info('Connection %d acquired', connection.threadId);
   });
   pool.on('release', function (connection) {
-    console.log('Connection %d released', connection.threadId);
+    logger.info('Connection %d released', connection.threadId);
   });
   return pool
 }
@@ -30,9 +31,9 @@ function teardownConnectionPool(pool) {
   // close all connections in the pool
   pool.end(function (err) {
     if (err) {
-      console.log('POOL END ERROR: ' + err.message);
+      logger.error('POOL END ERROR: ' + err.message);
     }
-    console.log('all pool connections have ended.');
+    logger.info('all pool connections have ended.');
   })
 }
 
@@ -44,11 +45,9 @@ function execAsyncQuery(pool, query) {
   return new Promise(function (resolve, reject) {
     pool.getConnection(function (err, connection) {
       if (err) {
-        console.log("POOL GET CONNECTION ERROR: " + err.message);
+        logger.error("POOL GET CONNECTION ERROR: " + err.message);
         reject(err);
       } else {
-        //resolve(connection);
-        console.log('time to query')
         connection.query(
           {
             sql: query,
@@ -57,10 +56,9 @@ function execAsyncQuery(pool, query) {
           function (err, results, fields) {
             connection.release();   // release DB connection back to the pool
             if (err) {
-              console.log("QUERY ERROR: " + err.message);
+              logger.error("QUERY ERROR: " + err.message);
               reject(err)
             } else {
-              //console.log('QUERY RESULTS: ' + results)
               resolve(results)
             }
           });
@@ -92,7 +90,7 @@ function getUsers (pool) {
     return queryData
   })
   .catch(error => {
-    console.log(error)
+    logger.error(error)
     return error
   })
 }
@@ -125,7 +123,7 @@ function getDistros (pool) {
     return distros
   })
   .catch(error => {
-    console.log(error)
+    logger.error(error)
     return error
   })
 }
@@ -133,7 +131,7 @@ function getDistros (pool) {
 function getSystemPools (pool) {
   return execAsyncQuery(pool, 'SELECT name FROM system_pool')
   .catch(error => {
-    console.log(error)
+    logger.error(error)
     return error
   })
 }
@@ -161,7 +159,7 @@ function getTasks (pool) {
     return tests
   })
   .catch(error => {
-    console.log(error)
+    logger.error(error)
     return error
   })
 }
@@ -191,7 +189,7 @@ function getSystems (pool) {
     return systems
   })
   .catch(error => {
-    console.log(error)
+    logger.error(error)
     return error
   })
 }
@@ -206,7 +204,7 @@ function getKernelPatches () {
     // get the APM linux versions on the local drive
     fs.readdir('/var/www/html/apm/kernelpatch', (err, files) => {
       if (err) {
-        console.log(err)
+        logger.error(err)
         reject(err)
       }
       let patches = []
@@ -229,7 +227,7 @@ function getFirmware () {
   return new Promise(function (resolve, reject) {
     fs.readdir('/var/www/html/apm/firmware', (err, files) => {
       if (err) {
-        console.log(err)
+        logger.error(err)
         reject(err)
       }
       var firmware = { smpmpro: [], aptio: [], bmc: [] }
@@ -289,7 +287,7 @@ module.exports = {
         return res.status(200).send(result)
       })
       .catch(error => {
-        console.log(error)
+        logger.error(error)
         res.status(400).send(error)
       })
     }
