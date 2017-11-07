@@ -31,10 +31,10 @@ module.exports = {
     ' + cmd_system + ' \
     --whiteboard='+wb_system+'_'+wb_fw+wb_distro+'_'+wb_patch+wb_test+' \
     --task='+req.body.test
-    logger.info(cmd)
+    logger.info('Executing Beaker command: ' + cmd)
     // execute command and collect output
     let p = new Promise(function (resolve, reject) {
-      child = exec('echo hello world',
+      child = exec(cmd,
         function (error, stdout, stderr) {
           var out = stdout
           var err = stderr
