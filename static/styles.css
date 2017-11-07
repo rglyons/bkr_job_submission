@@ -7,7 +7,7 @@ body {
 }
 
 .wrapper {
-  width: 70%;
+  width: 90%;
   height: auto;
   margin-left: auto;
   margin-right: auto;
@@ -52,7 +52,11 @@ h2 {
 }
 
 .step-title {
-  font-size: 3vmin;
+  font-size: 2vmin;
+}
+
+.step-title .thick {
+  font-weight: bold;
 }
 
 .step-sub-title {

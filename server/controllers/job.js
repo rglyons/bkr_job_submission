@@ -23,16 +23,18 @@ module.exports = {
     }
     let wb_test = req.body.test.split('/')[req.body.test.split('/').length-1]
     let wb_distro = req.body.distro.replace(/\s/g, '_')
-    let wb_patch = (req.body.patch) ? req.body.patch.substring(0, req.body.patch.indexOf('.ilp')) + '_' : ''
+    let wb_patch = (req.body.patch) ? 'krnlupgrade_' + req.body.patch.substring(0, req.body.patch.indexOf('.ilp')) + '_' : ''
+    let wb_fw = (req.body.firmware.smpmpro) ? 'fwupgrade_' : ''
     // build command line for execution
     let cmd = 'bkr workflow-simple --username='+req.body.user+' --password=beaker \
     --family='+req.body.family+'  --distro="'+req.body.distro+'" \
     ' + cmd_system + ' \
-    --whiteboard='+wb_system+'_'+wb_distro+'_'+wb_patch+wb_test+' \
+    --whiteboard='+wb_system+'_'+wb_fw+wb_distro+'_'+wb_patch+wb_test+' \
     --task='+req.body.test
+    logger.info(cmd)
     // execute command and collect output
     let p = new Promise(function (resolve, reject) {
-      child = exec(cmd,
+      child = exec('echo hello world',
         function (error, stdout, stderr) {
           var out = stdout
           var err = stderr

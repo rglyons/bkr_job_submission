@@ -227,17 +227,17 @@
       <!-- step 7 content -->
       <v-stepper-content step="7">
         <v-card class="mb-2 stepper-card">
-          <div class="step-title py-4 px-4">Username: <span class="green--text text-cs-center">{{ eUser }}</span></div>
-          <div v-if="eFW.smpmpro && eFW.aptio && eFW.bmc" class="step-title py-4 px-4">
+          <div class="step-title py-1 px-4">Username: <span class="thick green--text text-cs-center">{{ eUser }}</span></div>
+          <div v-if="eFW.smpmpro && eFW.aptio && eFW.bmc" class="step-title py-1 px-4">
             Firmware
-            <p>&nbsp;&nbsp;&nbsp;smpmpro: <span class="green--text">{{ eFW.smpmpro }}</span></p>
-            <p>&nbsp;&nbsp;&nbsp;aptio: <span class="green--text">{{ eFW.aptio }}</span></p>
-            <p>&nbsp;&nbsp;&nbsp;bmc: <span class="green--text">{{ eFW.bmc }}</span></p>
+            <p>&nbsp;&nbsp;&nbsp;smpmpro: <span class="thick green--text">{{ eFW.smpmpro }}</span></p>
+            <p>&nbsp;&nbsp;&nbsp;aptio: <span class="thick green--text">{{ eFW.aptio }}</span></p>
+            <p>&nbsp;&nbsp;&nbsp;bmc: <span class="thick green--text">{{ eFW.bmc }}</span></p>
           </div>
-          <div class="step-title py-4 px-4">Operating System: <span v-if="eOS" class="green--text">{{ eOS.distro }}</span></div>
-          <div v-if="eKP" class="step-title py-4 px-4">Kernel Patch: <span class="green--text">{{ eKP }}</span></div>
-          <div class="step-title py-4 px-4">Test: <span class="green--text">{{ eTest }}</span></div>
-          <div class="step-title py-4 px-4">Target System: <span class="green--text">{{ eSystem }}</span></div>
+          <div class="step-title py-1 px-4">Operating System: <span v-if="eOS" class="thick green--text">{{ eOS.distro }}</span></div>
+          <div v-if="eKP" class="step-title py-1 px-4">Kernel Patch: <span class="thick green--text">{{ eKP }}</span></div>
+          <div class="step-title py-1 px-4">Test: <span class="thick green--text">{{ eTest }}</span></div>
+          <div class="step-title py-1 px-4">Target System: <span class="thick green--text">{{ eSystem }}</span></div>
         </v-card>
         <v-btn
           class="success"
