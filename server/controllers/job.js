@@ -27,7 +27,7 @@ module.exports = {
     let wb_fw = (req.body.firmware.smpmpro) ? 'fwupgrade_' : ''
     // build command line for execution
     let cmd = 'bkr workflow-simple --username='+req.body.user+' --password=beaker \
-    --family='+req.body.family+'  --distro="'+req.body.distro+'" \
+    --arch=aarch64 --family='+req.body.family+'  --distro="'+req.body.distro+'" \
     ' + cmd_system + ' \
     --whiteboard='+wb_system+'_'+wb_fw+wb_distro+'_'+wb_patch+wb_test+' \
     --task='+req.body.test
