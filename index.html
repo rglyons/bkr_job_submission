@@ -39,7 +39,7 @@
         <v-stepper-step step="4" :complete="e1 > 4">
           Kernel Patch
           <small v-if="!eKP">Optional</small>
-          <small v-else-if="eKP">{{ eKP }}</small>
+          <small v-else-if="eKP">Kernel patch selected</small>
         </v-stepper-step>
         <v-divider></v-divider>
         <v-stepper-step step="5" :complete="eTest && e1 > 5" :rules="[validateStepFive]">
